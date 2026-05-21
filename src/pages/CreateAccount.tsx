@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
-import exatomLogo from "@/assets/exatom-logo.svg";
+import Logo from "@/components/Logo";
 
 const CreateAccount = () => {
   const [email, setEmail] = useState("");
@@ -31,12 +31,7 @@ const CreateAccount = () => {
     <div className="relative min-h-screen bg-background">
       {/* Logo */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-8">
-        <img
-          src={exatomLogo}
-          alt="Exatom"
-          className="max-w-[96px] cursor-pointer"
-          onClick={() => navigate("/pricing")}
-        />
+        <Logo maxWidth="96px" onClick={() => navigate("/pricing")} />
       </div>
 
       {/* Centered content */}

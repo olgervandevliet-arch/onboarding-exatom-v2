@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
-import exatomLogo from "@/assets/exatom-logo.svg";
+import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -567,7 +567,7 @@ const GetStarted = () => {
       {/* ---- Sidebar (desktop) ---- */}
       <aside className="hidden md:flex w-60 bg-background border-r border-border flex-col shrink-0 sticky top-0 h-screen">
         <div className="p-4">
-          <img src={exatomLogo} alt="Exatom" className="max-w-[96px]" />
+          <Logo maxWidth="96px" />
         </div>
         {sidebarContent}
       </aside>
@@ -577,7 +577,7 @@ const GetStarted = () => {
         <SheetContent side="left" className="w-60 p-0 flex flex-col">
           <SheetHeader className="p-4 pb-0">
             <SheetTitle>
-              <img src={exatomLogo} alt="Exatom" className="max-w-[96px]" />
+              <Logo maxWidth="96px" />
             </SheetTitle>
           </SheetHeader>
           {sidebarContent}

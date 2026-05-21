@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { User, Building2, Globe } from "lucide-react";
 import onboardingVisual from "@/assets/onboarding-visual.jpg";
-import exatomLogo from "@/assets/exatom-logo.svg";
+import Logo from "@/components/Logo";
 
 const ROLES = [
   "Owner",
@@ -80,7 +80,7 @@ const Onboarding = () => {
           </Button>
         </div>
         <div className="p-4 sm:p-8">
-          <img src={exatomLogo} alt="Exatom" className="max-w-[96px] cursor-pointer" onClick={() => navigate("/pricing")} />
+          <Logo maxWidth="96px" onClick={() => navigate("/pricing")} />
         </div>
 
         {/* Content */}

@@ -21,7 +21,7 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
-import exatomLogo from "@/assets/exatom-logo.svg";
+import Logo from "@/components/Logo";
 
 /* ────────────────────────────────────────────
    TOOLTIP MAPS
@@ -168,7 +168,7 @@ const Pricing = () => {
       {/* ─── Top bar ─── */}
       <header className="border-b border-border">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 h-16">
-          <img src={exatomLogo} alt="Exatom" className="max-w-[96px] cursor-pointer" onClick={() => navigate("/pricing")} />
+          <Logo maxWidth="96px" onClick={() => navigate("/pricing")} />
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <span className="cursor-default hover:text-foreground transition-colors">Product</span>
             <span className="cursor-default hover:text-foreground transition-colors">Customers</span>
@@ -431,7 +431,7 @@ const Pricing = () => {
       {/* ─── Footer ─── */}
       <footer className="border-t border-border py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <img src={exatomLogo} alt="Exatom" className="max-w-[64px] opacity-60" />
+          <Logo maxWidth="64px" opacity />
           <p>© {new Date().getFullYear()} Exatom. Cookieless form analytics.</p>
           <button
             onClick={() => navigate("/prompt-bibliotheek")}

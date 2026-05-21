@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import exatomLogo from "@/assets/exatom-logo.svg";
+import Logo from "@/components/Logo";
 
 const prompts = [
   {
@@ -491,12 +491,7 @@ const PromptLibrary = () => {
     <div className="min-h-screen bg-white font-sans">
       {/* Header */}
       <header className="border-b border-border py-5 px-6 flex items-center justify-between">
-        <img
-          src={exatomLogo}
-          alt="Exatom"
-          className="max-w-[96px] cursor-pointer"
-          onClick={() => navigate("/pricing")}
-        />
+        <Logo maxWidth="96px" onClick={() => navigate("/pricing")} />
         <button
           onClick={() => navigate("/pricing")}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -548,7 +543,7 @@ const PromptLibrary = () => {
       {/* Footer */}
       <footer className="border-t border-border py-8 mt-16">
         <div className="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <img src={exatomLogo} alt="Exatom" className="max-w-[64px] opacity-60" />
+          <Logo maxWidth="64px" opacity />
           <p>© {new Date().getFullYear()} Exatom. Cookieless form analytics.</p>
         </div>
       </footer>

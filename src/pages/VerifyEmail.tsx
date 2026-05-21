@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import exatomLogo from "@/assets/exatom-logo.svg";
+import Logo from "@/components/Logo";
 
 const VerifyEmail = () => {
   const [code, setCode] = useState("");
@@ -21,12 +21,7 @@ const VerifyEmail = () => {
     <div className="relative min-h-screen bg-background">
       {/* Logo */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-8">
-        <img
-          src={exatomLogo}
-          alt="Exatom"
-          className="max-w-[96px] cursor-pointer"
-          onClick={() => navigate("/pricing")}
-        />
+        <Logo maxWidth="96px" onClick={() => navigate("/pricing")} />
       </div>
 
       {/* Centered content */}

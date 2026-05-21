@@ -1,5 +1,5 @@
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
-import exatomLogo from "@/assets/exatom-logo.svg";
+import Logo from "@/components/Logo";
 
 interface OnboardingLayoutProps {
   step: number;
@@ -15,7 +15,7 @@ export const OnboardingLayout = ({ step, totalSteps, children }: OnboardingLayou
       <div className="flex-1 flex flex-col bg-background">
         {/* Logo */}
         <div className="p-8">
-          <img src={exatomLogo} alt="Exatom" className="max-w-[96px]" />
+          <Logo maxWidth="96px" />
         </div>
 
         {/* Content */}
