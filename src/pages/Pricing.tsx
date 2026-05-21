@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, ArrowRight, Info } from "lucide-react";
+import { Check, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -28,10 +28,10 @@ import Logo from "@/components/Logo";
    ──────────────────────────────────────────── */
 
 const COMPARISON_TOOLTIPS: Record<string, string> = {
-  "Monthly visits": "A unique browser session on any page where Exatom is installed. Multiple pageviews = 1 visit.",
+  "Monthly website visits": "A unique browser session on any page where Exatom is installed. Multiple pageviews = 1 visit.",
   "Form sessions": "Each time a visitor interacts with a tracked form counts as one session.",
   "Number of forms": "How many different forms you can track with Exatom.",
-  "Session recordings": "Replay exactly how visitors interact with your forms — clicks, hesitations, and corrections.",
+  "Session recordings": "Replay exactly how visitors interact with your forms: clicks, hesitations and corrections.",
   "Analytics data access": "How far back you can view your historical analytics data.",
   "Drop-off analysis": "See which form fields cause visitors to abandon, and at what step.",
   "Completion rate": "The percentage of visitors who start and successfully submit a form.",
@@ -45,7 +45,8 @@ const COMPARISON_TOOLTIPS: Record<string, string> = {
 };
 
 const CARD_TOOLTIPS: Record<string, string> = {
-  "See where visitors drop off": COMPARISON_TOOLTIPS["Drop-off analysis"],
+  "See where visitors drop off": "See your full form funnel: sessions, starts, submits, failures and drop-offs. Know exactly where visitors leave.",
+  "See your missed conversion potential": "Know how much revenue is slipping away from visitors who start but never complete your form.",
   "Completion rate per form": COMPARISON_TOOLTIPS["Completion rate"],
   "Up to 5,000 sessions/mo": COMPARISON_TOOLTIPS["Form sessions"],
   "Full drop-off & friction insights": COMPARISON_TOOLTIPS["Drop-off analysis"],
@@ -61,8 +62,8 @@ const CARD_TOOLTIPS: Record<string, string> = {
 const InfoTip = ({ text }: { text: string }) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <span className="inline-flex items-center ml-1 cursor-help align-middle">
-        <Info className="w-3.5 h-3.5 text-muted-foreground" />
+      <span className="inline align-middle ml-1 cursor-help">
+        <Info className="w-3.5 h-3.5 text-muted-foreground inline align-middle" />
       </span>
     </TooltipTrigger>
     <TooltipContent side="top" className="max-w-[240px] text-xs">
@@ -76,15 +77,17 @@ const InfoTip = ({ text }: { text: string }) => (
    ──────────────────────────────────────────── */
 
 const PAID_TIERS = [
-  { id: "10k", label: "Up to 10,000", visits: "10,000", price: 79 },
-  { id: "25k", label: "Up to 25,000", visits: "25,000", price: 129 },
-  { id: "50k", label: "Up to 50,000", visits: "50,000", price: 199 },
+  { id: "10k", label: "Up to 10,000", visits: "10,000", price: 79, annualPrice: 59 },
+  { id: "25k", label: "Up to 25,000", visits: "25,000", price: 129, annualPrice: 99 },
+  { id: "50k", label: "Up to 50,000", visits: "50,000", price: 199, annualPrice: 159 },
 ] as const;
 
 const FREE_FEATURES = [
   "See where visitors drop off",
   "Completion rate per form",
-  "Up to 5,000 sessions/mo",
+  "See your missed conversion potential",
+  "Unlimited website visits",
+  "No credit card needed",
 ];
 
 const GROWTH_FEATURES = [
@@ -106,7 +109,7 @@ const ENTERPRISE_FEATURES = [
 
 /* Comparison table rows */
 const COMPARISON_ROWS: { feature: string; free: boolean | string; growth: boolean | string; enterprise: boolean | string }[] = [
-  { feature: "Monthly visits", free: false, growth: "Up to 50,000", enterprise: "50,000+" },
+  { feature: "Monthly website visits", free: false, growth: "Up to 50,000", enterprise: "50,000+" },
   { feature: "Form sessions", free: "Up to 5,000", growth: "Unlimited", enterprise: "Unlimited" },
   { feature: "Number of forms", free: "1", growth: "Unlimited", enterprise: "Unlimited" },
   { feature: "Session recordings", free: false, growth: true, enterprise: true },
@@ -160,7 +163,7 @@ const Pricing = () => {
 
   const currentTier = PAID_TIERS.find((t) => t.id === selectedTier) ?? PAID_TIERS[0];
   const isAnnual = billing === "annual";
-  const displayPrice = isAnnual ? Math.round(currentTier.price * 0.7) : currentTier.price;
+  const displayPrice = isAnnual ? currentTier.annualPrice : currentTier.price;
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -190,7 +193,7 @@ const Pricing = () => {
       <section className="max-w-3xl mx-auto text-center px-4 sm:px-8 py-16">
         <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Pricing</p>
         <h1 className="mt-3 text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-tight max-w-xl mx-auto">
-          Cheaper than wasted ad spend
+          Cheaper Than Wasted Leads
         </h1>
       </section>
 
@@ -224,7 +227,7 @@ const Pricing = () => {
             <p className="text-lg font-semibold text-foreground">Free</p>
             {/* Row 2: Description (fixed height) */}
             <p className="mt-1 text-sm text-muted-foreground h-[40px]">
-              See where your visitors drop off.
+              See how many visitors abandon your form and how much revenue you're missing.
             </p>
             {/* Row 3: Price */}
             <p className="mt-4 text-4xl font-bold text-foreground">€0</p>
@@ -234,8 +237,8 @@ const Pricing = () => {
             {/* Row 5: Features */}
             <ul className="mt-6 space-y-2.5 flex-1">
               {FREE_FEATURES.map((f) => (
-                <li key={f} className="text-sm text-foreground">
-                  <Check className="w-4 h-4 mr-2 inline-block align-text-bottom opacity-50" />
+                <li key={f} className="text-sm text-foreground flex items-start gap-2">
+                  <Check className="w-4 h-4 mt-0.5 shrink-0 opacity-50" />
                   <span>{f}{CARD_TOOLTIPS[f] && <InfoTip text={CARD_TOOLTIPS[f]} />}</span>
                 </li>
               ))}
@@ -269,7 +272,7 @@ const Pricing = () => {
               <span className="text-base font-normal text-muted-foreground"> / month</span>
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Up to {currentTier.visits} monthly visits
+              Up to {currentTier.visits} monthly website visits
             </p>
             {/* Row 4: Selector area */}
             <div className="mt-4">
@@ -279,7 +282,7 @@ const Pricing = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {PAID_TIERS.map((tier) => {
-                    const p = isAnnual ? Math.round(tier.price * 0.7) : tier.price;
+                    const p = isAnnual ? tier.annualPrice : tier.price;
                     return (
                       <SelectItem key={tier.id} value={tier.id}>
                         {tier.label} visits/mo — €{p}/mo
@@ -292,8 +295,8 @@ const Pricing = () => {
             {/* Row 5: Features */}
             <ul className="mt-6 space-y-2.5 flex-1">
               {GROWTH_FEATURES.map((f) => (
-                <li key={f} className="text-sm text-foreground">
-                  <Check className="w-4 h-4 mr-2 inline-block align-text-bottom" />
+                <li key={f} className="text-sm text-foreground flex items-start gap-2">
+                  <Check className="w-4 h-4 mt-0.5 shrink-0" />
                   <span>{f}{CARD_TOOLTIPS[f] && <InfoTip text={CARD_TOOLTIPS[f]} />}</span>
                 </li>
               ))}
@@ -304,7 +307,7 @@ const Pricing = () => {
               size="lg"
               onClick={() => navigate("/signup")}
             >
-              Start 7 day free trial <ArrowRight className="w-4 h-4 ml-1" />
+              Get started today
             </Button>
           </div>
 
@@ -318,14 +321,14 @@ const Pricing = () => {
             </p>
             {/* Row 3: Price */}
             <p className="mt-4 text-4xl font-bold text-foreground">Let's talk</p>
-            <p className="text-sm text-muted-foreground mt-1">From 50,000+ monthly visits</p>
+            <p className="text-sm text-muted-foreground mt-1">From 50,000+ monthly website visits</p>
             {/* Row 4: Selector area (fixed height to match Growth dropdown) */}
             <div className="mt-4 h-[44px]" />
             {/* Row 5: Features */}
             <ul className="mt-6 space-y-2.5 flex-1">
               {ENTERPRISE_FEATURES.map((f) => (
-                <li key={f} className="text-sm text-foreground">
-                  <Check className="w-4 h-4 mr-2 inline-block align-text-bottom" />
+                <li key={f} className="text-sm text-foreground flex items-start gap-2">
+                  <Check className="w-4 h-4 mt-0.5 shrink-0" />
                   <span>{f}{CARD_TOOLTIPS[f] && <InfoTip text={CARD_TOOLTIPS[f]} />}</span>
                 </li>
               ))}
@@ -343,7 +346,7 @@ const Pricing = () => {
 
         {/* Microcopy under all columns */}
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Self-serve · Cancel anytime · Fair pricing based on monthly visits
+          Self-serve · Cancel anytime · Fair pricing based on monthly website visits
         </p>
       </section>
 
