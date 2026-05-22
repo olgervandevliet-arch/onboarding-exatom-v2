@@ -406,6 +406,8 @@ const GetStarted = () => {
   const [tooltipItems, setTooltipItems] = useState(SMART_TOOLTIP_ITEMS.map(i => ({ ...i })));
   const [tooltipsApplied, setTooltipsApplied] = useState(false);
 
+  const [siteOwnerAnswer, setSiteOwnerAnswer] = useState<"owner" | "agency" | null>(null);
+
   const toggleStep = (step: number) => {
     const previousSteps = Array.from({ length: step - 1 }, (_, i) => i + 1);
     const allPreviousCompleted = previousSteps.every((s) => completedSteps.has(s));
@@ -606,10 +608,12 @@ const GetStarted = () => {
       </nav>
 
       <div className="p-3 space-y-1">
-        <Button className="w-full" size="sm" onClick={() => navigate("/pricing")}>
-          <Star className="w-4 h-4 mr-1" />
-          Upgrade your plan
-        </Button>
+        {!isPaidPlan && (
+          <Button className="w-full" size="sm" onClick={() => navigate("/pricing")}>
+            <Star className="w-4 h-4 mr-1" />
+            Upgrade your plan
+          </Button>
+        )}
         <SidebarItem icon={HelpCircle} label="Support" />
         <SidebarItem icon={Settings} label="Settings" />
       </div>
@@ -660,9 +664,11 @@ const GetStarted = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
-            <span className="hidden sm:inline text-xs text-muted-foreground border border-border rounded px-3 py-1 cursor-pointer hover:text-foreground transition-colors" onClick={() => navigate("/pricing")}>
-              Free plan
-            </span>
+            {!isPaidPlan && (
+              <span className="hidden sm:inline text-xs text-muted-foreground border border-border rounded px-3 py-1 cursor-pointer hover:text-foreground transition-colors" onClick={() => navigate("/pricing")}>
+                Free plan
+              </span>
+            )}
             <Bell className="w-4 h-4 text-muted-foreground" />
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer outline-none">
@@ -1179,6 +1185,12 @@ const GetStarted = () => {
                     </p>
                   </div>
                   <Button onClick={() => navigate("/pricing")}>Upgrade to Growth</Button>
+                  <button
+                    onClick={() => skipStep(4)}
+                    className="text-xs text-muted-foreground hover:text-foreground underline"
+                  >
+                    Skip for now
+                  </button>
                 </div>
               ) : (
               <div className="space-y-5">
@@ -1225,28 +1237,60 @@ const GetStarted = () => {
                     </div>
                   )}
 
+                  {!autofixesApplied && siteOwnerAnswer === null && (
+                    <div className="bg-muted/40 rounded-lg p-4 space-y-3">
+                      <p className="text-sm font-semibold">Before we apply — are you the site owner?</p>
+                      <p className="text-xs text-muted-foreground">This determines how fixes are activated on your site.</p>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setSiteOwnerAnswer("owner")}>
+                          Yes, I own this site
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => setSiteOwnerAnswer("agency")}>
+                          No, I manage it for a client
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant={autofixesApplied ? "outline" : "default"}
-                      onClick={() => {
-                        setAutofixItems(AUTOFIX_ITEMS.map(i => ({ ...i })));
-                        setAutofixDialogOpen(true);
-                      }}
-                    >
-                      {autofixesApplied ? "View autofixes" : "Apply autofixes"}
-                    </Button>
-                    {autofixesApplied && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setAutofixItems(AUTOFIX_ITEMS.map(i => ({ ...i })));
-                          setAutofixDialogOpen(true);
-                        }}
-                      >
-                        <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
-                      </Button>
+                    {siteOwnerAnswer === "agency" && !autofixesApplied ? (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setAutofixItems(AUTOFIX_ITEMS.map(i => ({ ...i }))); setAutofixDialogOpen(true); }}
+                        >
+                          Preview & request approval
+                        </Button>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Shield className="w-3 h-3" /> Changes go to a staging preview — your client approves before going live.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          size="sm"
+                          variant={autofixesApplied ? "outline" : "default"}
+                          onClick={() => {
+                            setAutofixItems(AUTOFIX_ITEMS.map(i => ({ ...i })));
+                            setAutofixDialogOpen(true);
+                          }}
+                        >
+                          {autofixesApplied ? "View autofixes" : "Preview autofixes"}
+                        </Button>
+                        {autofixesApplied && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setAutofixItems(AUTOFIX_ITEMS.map(i => ({ ...i })));
+                              setAutofixDialogOpen(true);
+                            }}
+                          >
+                            <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -1335,46 +1379,92 @@ const GetStarted = () => {
               onToggle={() => toggleStep(5)}
               locked={!completedSteps.has(4)}
             >
-              <div className="space-y-5">
-                <p className="text-sm text-muted-foreground">
-                  Discover all the tools Exatom offers to understand and improve your forms.
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Left: Celebration */}
+                <div className="flex flex-col gap-4">
+                  <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center">
+                    <PartyPopper className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Exatom is ready!</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Your setup is complete. Exatom is now tracking your forms and collecting data.
+                    </p>
+                  </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { icon: BarChart3, title: "Form engagement", desc: "See how users interact with your forms in real-time" },
-                    { icon: Monitor, title: "Session replays", desc: "Watch recordings of users filling out your forms" },
-                    { icon: Globe, title: "Industry benchmarks", desc: "Compare your form performance against industry averages" },
-                    { icon: Sparkles, title: "AI analysis", desc: "Get AI-powered suggestions to improve conversions" },
-                  ].map((item) => (
-                    <button key={item.title} className="bg-surface rounded p-4 text-left hover:bg-muted transition-colors">
-                      <item.icon className="w-5 h-5 mb-2" />
-                      <p className="font-semibold text-sm">{item.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
-                    </button>
-                  ))}
+                  <div className="bg-surface rounded-lg p-4 space-y-3 border border-border">
+                    <p className="text-sm font-semibold">What happens next?</p>
+                    <ul className="text-sm text-muted-foreground space-y-2">
+                      <li className="flex items-start gap-2">
+                        <BarChart3 className="w-4 h-4 mt-0.5 shrink-0" />
+                        <span>It usually takes a <strong className="text-foreground">few days</strong> before you have enough data for meaningful insights.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Bell className="w-4 h-4 mt-0.5 shrink-0" />
+                        <span>We'll notify you as soon as your first insights are ready.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Sparkles className="w-4 h-4 mt-0.5 shrink-0" />
+                        <span>In the meantime, explore Exatom with <strong className="text-foreground">demo data</strong> to see what insights look like.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Shareable drop-off chart */}
+                  <div className="bg-surface rounded-lg p-4 border border-dashed border-border space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold">Share your drop-off insights</p>
+                      <Button variant="outline" size="sm" className="gap-1" onClick={() => { toast("Public link copied to clipboard!"); }}>
+                        <ExternalLink className="w-3.5 h-3.5" /> Copy share link
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Share a public URL of your drop-off chart with your team or management — no Exatom account needed.</p>
+                  </div>
+
+                  {isPaidPlan ? null : (
+                    <div className="border border-border rounded-lg p-4 flex items-center gap-3">
+                      <Star className="w-5 h-5 text-primary shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold">You're on the free plan</p>
+                        <p className="text-xs text-muted-foreground">Upgrade anytime to unlock autofixes, smart tooltips and more.</p>
+                      </div>
+                      <Button size="sm" variant="outline" onClick={() => navigate("/pricing")}>Upgrade</Button>
+                    </div>
+                  )}
+
+                  <StepActions
+                    onComplete={() => completeStep(5)}
+                    completeLabel="Go to dashboard"
+                  />
                 </div>
 
-                <div className="bg-surface rounded p-5 border border-dashed border-border">
-                  <div className="flex items-center gap-3">
-                    <Monitor className="w-5 h-5 text-muted-foreground" />
+                {/* Right: Eureka CTA + case studies */}
+                <div className="flex flex-col gap-4">
+                  <div className="border-2 border-foreground rounded-xl p-6 flex flex-col gap-4">
+                    <Sparkles className="w-7 h-7" />
                     <div>
-                      <p className="font-semibold text-sm">Try with demo data</p>
-                      <p className="text-xs text-muted-foreground">
-                        Explore the platform with pre-filled example data — session replays, tooltips, A/B tests and more.
-                      </p>
+                      <p className="text-lg font-bold">Explore your forms with Eureka</p>
+                      <p className="text-sm text-muted-foreground mt-1">Ask Eureka AI anything about your form performance — even before your data is in.</p>
                     </div>
-                    <Button variant="outline" size="sm" className="shrink-0 ml-auto">
-                      Explore demo
+                    <Button size="lg" className="w-full gap-2">
+                      <MessageSquare className="w-4 h-4" /> Ask Eureka AI
                     </Button>
                   </div>
-                </div>
 
-                <StepActions
-                  onComplete={() => completeStep(5)}
-                  onSkip={() => skipStep(5)}
-                  completeLabel="Mark as done"
-                />
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">See it in action</p>
+                    {[
+                      { title: "How Acme increased checkout conversion by 18%", tag: "Case study" },
+                      { title: "Getting started with drop-off analysis", tag: "Video · 3 min" },
+                      { title: "Your first form insights — what to look for", tag: "Guide" },
+                    ].map((item) => (
+                      <button key={item.title} className="w-full text-left bg-surface border border-border rounded-lg p-3 hover:bg-muted transition-colors">
+                        <p className="text-sm font-medium">{item.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{item.tag}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </AccordionStep>
           </div>
@@ -2196,66 +2286,18 @@ const GetStarted = () => {
 
       {/* ---- Onboarding Completion Dialog ---- */}
       <Dialog open={completionDialogOpen} onOpenChange={setCompletionDialogOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[820px] p-4 sm:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left: Congratulations */}
-            <div className="flex flex-col gap-4">
-              <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
-                <PartyPopper className="w-8 h-8" />
-              </div>
-              <h2 className="text-2xl font-bold">You're all set!</h2>
-              <p className="text-sm text-muted-foreground">
-                Your onboarding is complete. Exatom is now tracking your forms and collecting data.
-                It usually takes a <strong>few days</strong> to gather enough data for meaningful insights — we'll notify you as soon as results are ready.
-              </p>
-
-              <div className="bg-surface rounded-lg p-4 space-y-3">
-                <p className="text-sm font-semibold">What happens next?</p>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li className="flex items-start gap-2">
-                    <BarChart3 className="w-4 h-4 mt-0.5 shrink-0" />
-                    <span>Data from your form fields will start flowing in over the coming days.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Sparkles className="w-4 h-4 mt-0.5 shrink-0" />
-                    <span>Once enough data is collected, you'll get AI-powered recommendations.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Bell className="w-4 h-4 mt-0.5 shrink-0" />
-                    <span>Set up <strong>performance alerts</strong> to get notified when something needs attention.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="border border-border rounded-lg p-4 flex items-center gap-3">
-                <Star className="w-5 h-5 text-primary shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold">You're on the free plan</p>
-                  <p className="text-xs text-muted-foreground">Upgrade anytime to unlock all features.</p>
-                </div>
-              </div>
-
-              <Button variant="outline" onClick={() => setCompletionDialogOpen(false)}>
-                Go to Dashboard
-              </Button>
+        <DialogContent className="max-w-[95vw] sm:max-w-[420px] p-8 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
+              <PartyPopper className="w-8 h-8" />
             </div>
-
-            {/* Right: Eureka CTA */}
-            <div className="flex flex-col gap-4 justify-center">
-              <div className="border border-primary/20 bg-primary/5 rounded-lg p-6 flex flex-col gap-4">
-                <TrendingUp className="w-8 h-8 text-primary" />
-                <div>
-                  <p className="text-lg font-bold">Unlock up to +30% conversion improvement</p>
-                  <p className="text-sm text-muted-foreground mt-1">Upgrade to Growth for data driven optimization, AI A/B testing, and advanced drop-off recovery.</p>
-                </div>
-                <Button onClick={() => { setCompletionDialogOpen(false); navigate("/pricing"); }}>
-                  Upgrade to Growth
-                </Button>
-              </div>
-              <Button className="gap-1" variant="outline" onClick={() => setCompletionDialogOpen(false)}>
-                <Bell className="w-4 h-4" /> Set up performance alerts
-              </Button>
-            </div>
+            <h2 className="text-xl font-bold">You're all set!</h2>
+            <p className="text-sm text-muted-foreground">
+              Exatom is tracking your forms. Check back in a few days for your first insights.
+            </p>
+            <Button className="w-full" onClick={() => { setCompletionDialogOpen(false); navigate("/get-started"); }}>
+              Go to dashboard
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
