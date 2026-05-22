@@ -376,7 +376,7 @@ const Pricing = () => {
                     €{displayPrice}<span className="text-xs font-normal text-muted-foreground"> / month</span>
                   </p>
                   <Button size="sm" className="mt-3 w-full" onClick={() => { localStorage.setItem("exatom_plan", "growth"); navigate("/signup"); }}>
-                    Start trial
+                    Get started
                   </Button>
                 </th>
                 <th className="text-center p-4 sm:p-6 align-top min-w-[180px]">

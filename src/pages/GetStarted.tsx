@@ -661,7 +661,7 @@ const GetStarted = () => {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <span className="hidden sm:inline text-xs text-muted-foreground border border-border rounded px-3 py-1 cursor-pointer hover:text-foreground transition-colors" onClick={() => navigate("/pricing")}>
-              14 trial days left
+              Free plan
             </span>
             <Bell className="w-4 h-4 text-muted-foreground" />
             <DropdownMenu>
@@ -2067,7 +2067,7 @@ const GetStarted = () => {
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <p className="text-xs text-muted-foreground bg-muted/50 rounded px-3 py-2">
-              All teammates get full access during your trial.
+              All teammates get full access on the free plan.
             </p>
             {inviteRows.map((row, i) => (
               <div key={i} className="flex items-center gap-3">
@@ -2123,7 +2123,7 @@ const GetStarted = () => {
           <DialogHeader>
             <DialogTitle className="text-xl">Boost your form conversions by up to 30%</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground pt-2">
-              Welcome {userName.split(' ')[0]} — your 14-day free trial starts now. In the next few minutes, you'll set up quick wins that give your forms an immediate boost of ~5-8%. The real gains come after — with data driven optimization.
+              Welcome {userName.split(' ')[0]} — you're on the free plan. In the next few minutes, you'll set up quick wins that give your forms an immediate boost of ~5-8%. The real gains come after — with data driven optimization.
             </DialogDescription>
           </DialogHeader>
           <div className="border border-border rounded-lg p-4 space-y-3 mt-2">
@@ -2158,7 +2158,7 @@ const GetStarted = () => {
                 <span className="text-xs">avg. +5-10% conversions</span>
               </div>
             </div>
-            <p className="text-[11px] text-muted-foreground italic">Available with Pro plan — unlock the full +30% potential after your trial</p>
+            <p className="text-[11px] text-muted-foreground italic">Available on the Growth plan — unlock the full +30% potential by upgrading</p>
           </div>
           <Button className="w-full mt-4" onClick={() => setShowWelcomeDialog(false)}>Start boosting my forms</Button>
         </DialogContent>
@@ -2230,8 +2230,8 @@ const GetStarted = () => {
               <div className="border border-border rounded-lg p-4 flex items-center gap-3">
                 <Star className="w-5 h-5 text-primary shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold">Free trial — 14 days remaining</p>
-                  <p className="text-xs text-muted-foreground">Full access to all features during your trial.</p>
+                  <p className="text-sm font-semibold">You're on the free plan</p>
+                  <p className="text-xs text-muted-foreground">Upgrade anytime to unlock all features.</p>
                 </div>
               </div>
 
