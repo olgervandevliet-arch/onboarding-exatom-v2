@@ -333,6 +333,8 @@ const GetStarted = () => {
   const [companyName, setCompanyName] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
 
+  const isPaidPlan = localStorage.getItem("exatom_plan") === "growth";
+
   useEffect(() => {
     const name = localStorage.getItem("exatom_user_name");
     const company = localStorage.getItem("exatom_company_name");
@@ -559,7 +561,7 @@ const GetStarted = () => {
   const availableRemainingForms = remainingForms.filter(sf => !addedForms.some(af => af.url === sf.url));
 
   const handleSidebarItemClick = (label: string) => {
-    if (LOCKED_FEATURES[label]) {
+    if (!isPaidPlan && LOCKED_FEATURES[label]) {
       setUpgradeModalFeature(label);
       setUpgradeModalOpen(true);
     } else {
@@ -581,7 +583,7 @@ const GetStarted = () => {
               icon={item.icon}
               label={item.label}
               indent
-              locked={!!LOCKED_FEATURES[item.label]}
+              locked={!isPaidPlan && !!LOCKED_FEATURES[item.label]}
               onClick={() => handleSidebarItemClick(item.label)}
             />
           ))}
@@ -594,7 +596,7 @@ const GetStarted = () => {
               icon={item.icon}
               label={item.label}
               indent
-              locked={!!LOCKED_FEATURES[item.label]}
+              locked={!isPaidPlan && !!LOCKED_FEATURES[item.label]}
               onClick={() => handleSidebarItemClick(item.label)}
             />
           ))}
@@ -673,6 +675,7 @@ const GetStarted = () => {
                   localStorage.removeItem("exatom_user_name");
                   localStorage.removeItem("exatom_company_name");
                   localStorage.removeItem("exatom_website_url");
+                  localStorage.removeItem("exatom_plan");
                   navigate("/");
                 }}>
                   <RotateCcw className="w-4 h-4 mr-2" />
@@ -1166,6 +1169,18 @@ const GetStarted = () => {
               onToggle={() => toggleStep(4)}
               locked={!completedSteps.has(3)}
             >
+              {!isPaidPlan ? (
+                <div className="flex flex-col items-center text-center py-8 px-6 gap-4">
+                  <LockKeyhole className="w-8 h-8 text-muted-foreground" />
+                  <div>
+                    <p className="font-semibold text-foreground">Unlock instant improvements</p>
+                    <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
+                      Apply autofixes and smart tooltips to immediately boost your form conversion rate. Available on the Growth plan.
+                    </p>
+                  </div>
+                  <Button onClick={() => navigate("/pricing")}>Upgrade to Growth</Button>
+                </div>
+              ) : (
               <div className="space-y-5">
                 <p className="text-sm text-muted-foreground">
                   Start improving your forms right away — no traffic data or developer needed.
@@ -1308,6 +1323,7 @@ const GetStarted = () => {
 
                 <StepActions onSkip={() => skipStep(4)} />
               </div>
+              )}
             </AccordionStep>
 
             {/* ========== STEP 5: Explore Exatom ========== */}

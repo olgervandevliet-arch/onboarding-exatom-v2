@@ -251,7 +251,7 @@ const Pricing = () => {
               className="mt-8 w-full"
               variant="outline"
               size="lg"
-              onClick={() => navigate("/signup")}
+              onClick={() => { localStorage.setItem("exatom_plan", "free"); navigate("/signup"); }}
             >
               Start free
             </Button>
@@ -308,7 +308,7 @@ const Pricing = () => {
             <Button
               className="mt-8 w-full"
               size="lg"
-              onClick={() => navigate("/signup")}
+              onClick={() => { localStorage.setItem("exatom_plan", "growth"); navigate("/signup"); }}
             >
               Get started today
             </Button>
@@ -365,7 +365,7 @@ const Pricing = () => {
                 <th className="text-center p-4 sm:p-6 align-top min-w-[180px]">
                   <p className="text-xs text-muted-foreground font-normal">Free</p>
                   <p className="text-xl font-bold text-foreground mt-1">€0<span className="text-xs font-normal text-muted-foreground"> / forever</span></p>
-                  <Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => navigate("/signup")}>
+                  <Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => { localStorage.setItem("exatom_plan", "free"); navigate("/signup"); }}>
                     Start free
                   </Button>
                 </th>
@@ -375,7 +375,7 @@ const Pricing = () => {
                     {isAnnual && <span className="text-sm text-muted-foreground line-through mr-1">€{currentTier.price}</span>}
                     €{displayPrice}<span className="text-xs font-normal text-muted-foreground"> / month</span>
                   </p>
-                  <Button size="sm" className="mt-3 w-full" onClick={() => navigate("/signup")}>
+                  <Button size="sm" className="mt-3 w-full" onClick={() => { localStorage.setItem("exatom_plan", "growth"); navigate("/signup"); }}>
                     Start trial
                   </Button>
                 </th>
