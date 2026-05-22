@@ -2281,18 +2281,29 @@ const GetStarted = () => {
 const StepActions = ({
   onComplete,
   completeLabel,
+  onSkip,
 }: {
   onComplete?: () => void;
   onSkip?: () => void;
   completeLabel?: string;
 }) => {
-  if (!onComplete || !completeLabel) return null;
+  if (!onComplete && !onSkip) return null;
   return (
     <div className="flex items-center gap-3 pt-2">
-      <Button size="sm" onClick={onComplete}>
-        <Check className="w-3 h-3 mr-1" />
-        {completeLabel}
-      </Button>
+      {onComplete && completeLabel && (
+        <Button size="sm" onClick={onComplete}>
+          <Check className="w-3 h-3 mr-1" />
+          {completeLabel}
+        </Button>
+      )}
+      {onSkip && (
+        <button
+          onClick={onSkip}
+          className="text-xs text-muted-foreground hover:text-foreground underline"
+        >
+          Skip for now
+        </button>
+      )}
     </div>
   );
 };
