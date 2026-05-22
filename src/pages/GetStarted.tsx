@@ -1410,28 +1410,6 @@ const GetStarted = () => {
                     </ul>
                   </div>
 
-                  {/* Shareable drop-off chart */}
-                  <div className="bg-surface rounded-lg p-4 border border-dashed border-border space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold">Share your drop-off insights</p>
-                      <Button variant="outline" size="sm" className="gap-1" onClick={() => { toast("Public link copied to clipboard!"); }}>
-                        <ExternalLink className="w-3.5 h-3.5" /> Copy share link
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Share a public URL of your drop-off chart with your team or management — no Exatom account needed.</p>
-                  </div>
-
-                  {isPaidPlan ? null : (
-                    <div className="border border-border rounded-lg p-4 flex items-center gap-3">
-                      <Star className="w-5 h-5 text-primary shrink-0" />
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold">You're on the free plan</p>
-                        <p className="text-xs text-muted-foreground">Upgrade anytime to unlock autofixes, smart tooltips and more.</p>
-                      </div>
-                      <Button size="sm" variant="outline" onClick={() => navigate("/pricing")}>Upgrade</Button>
-                    </div>
-                  )}
-
                   <StepActions
                     onComplete={() => completeStep(5)}
                     completeLabel="Go to dashboard"
@@ -1451,19 +1429,9 @@ const GetStarted = () => {
                     </Button>
                   </div>
 
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">See it in action</p>
-                    {[
-                      { title: "How Acme increased checkout conversion by 18%", tag: "Case study" },
-                      { title: "Getting started with drop-off analysis", tag: "Video · 3 min" },
-                      { title: "Your first form insights — what to look for", tag: "Guide" },
-                    ].map((item) => (
-                      <button key={item.title} className="w-full text-left bg-surface border border-border rounded-lg p-3 hover:bg-muted transition-colors">
-                        <p className="text-sm font-medium">{item.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{item.tag}</p>
-                      </button>
-                    ))}
-                  </div>
+                  <Button variant="outline" className="w-full gap-2">
+                    <Monitor className="w-4 h-4" /> View a dashboard with demo data
+                  </Button>
                 </div>
               </div>
             </AccordionStep>
