@@ -86,6 +86,8 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -104,6 +106,14 @@ const SIDEBAR_IMPROVEMENTS = [
   { icon: Zap, label: "Autofixes" },
   { icon: CheckCircle, label: "Smart tooltips" },
 ];
+
+const LOCKED_FEATURES: Record<string, string> = {
+  "Field metrix": "See exactly which fields cause drop-offs and where visitors hesitate.",
+  "Session replays": "Watch real recordings of visitors filling out your forms.",
+  "Industry benchmarks": "Compare your form's conversion rate against industry averages.",
+  "Autofixes": "Automatically fix the issues that cause visitors to abandon your form.",
+  "Smart tooltips": "Add smart nudges that guide visitors through difficult fields.",
+};
 
 const CATEGORIES = [
   { value: "lead", label: "Lead gen", icon: UserPlus },
@@ -294,6 +304,18 @@ const DonutChart = ({ score, max = 100 }: { score: number; max?: number }) => {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Convert slider position (0–100) to logarithmic value (1–10000) */
+const sliderPositionToValue = (position: number): number =>
+  Math.round(Math.exp((Math.log(10000) * position) / 100));
+
+/** Convert actual value (1–10000) to slider position (0–100) */
+const valueToSliderPosition = (value: number): number =>
+  Math.round((Math.log(value) / Math.log(10000)) * 100);
+
+/* ------------------------------------------------------------------ */
 /*  Main Component                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -330,7 +352,7 @@ const GetStarted = () => {
   const [formName, setFormName] = useState("");
   const [formUrl, setFormUrl] = useState("");
   const [isEditingFormUrl, setIsEditingFormUrl] = useState(false);
-  const [conversionValue, setConversionValue] = useState([5000]);
+  const [conversionValue, setConversionValue] = useState([100]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [hasThankYouPage, setHasThankYouPage] = useState<boolean | null>(null);
   const [editingFormIndex, setEditingFormIndex] = useState<number | null>(null);
@@ -351,6 +373,9 @@ const GetStarted = () => {
   const [shopifyDialogOpen, setShopifyDialogOpen] = useState(false);
   const [wordpressDialogOpen, setWordpressDialogOpen] = useState(false);
   const [emailDevDialogOpen, setEmailDevDialogOpen] = useState(false);
+  const [emailDevAddress, setEmailDevAddress] = useState("");
+  const [emailDevPersonalNote, setEmailDevPersonalNote] = useState("");
+  const [emailDevSendCopy, setEmailDevSendCopy] = useState(false);
 
   // Invite dialog
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
@@ -364,6 +389,11 @@ const GetStarted = () => {
   const [fullReportOpen, setFullReportOpen] = useState(false);
   const [editingVisitors, setEditingVisitors] = useState(false);
   const [visitorsInput, setVisitorsInput] = useState("");
+
+  // Sidebar active item + upgrade modal
+  const [activeSidebarItem, setActiveSidebarItem] = useState<string | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [upgradeModalFeature, setUpgradeModalFeature] = useState("");
 
   // Step 4: Autofixes & Smart tooltips dialogs
   const [autofixDialogOpen, setAutofixDialogOpen] = useState(false);
@@ -419,7 +449,7 @@ const GetStarted = () => {
     setIsEditingFormUrl(!defaults?.url);
     setShowFormFields(false);
     setHasThankYouPage(null);
-    setConversionValue([5000]);
+    setConversionValue([100]);
     setSelectedCategory(defaults?.category || "");
     setEditingFormIndex(null);
     setConversionTagVerified(false);
@@ -528,6 +558,15 @@ const GetStarted = () => {
   const availableTopForms = topForms.filter(sf => !addedForms.some(af => af.url === sf.url));
   const availableRemainingForms = remainingForms.filter(sf => !addedForms.some(af => af.url === sf.url));
 
+  const handleSidebarItemClick = (label: string) => {
+    if (LOCKED_FEATURES[label]) {
+      setUpgradeModalFeature(label);
+      setUpgradeModalOpen(true);
+    } else {
+      setActiveSidebarItem(label);
+    }
+  };
+
   const sidebarContent = (
     <>
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
@@ -537,13 +576,27 @@ const GetStarted = () => {
 
         <SidebarSection title="Insights">
           {SIDEBAR_INSIGHTS.map((item) => (
-            <SidebarItem key={item.label} icon={item.icon} label={item.label} indent />
+            <SidebarItem
+              key={item.label}
+              icon={item.icon}
+              label={item.label}
+              indent
+              locked={!!LOCKED_FEATURES[item.label]}
+              onClick={() => handleSidebarItemClick(item.label)}
+            />
           ))}
         </SidebarSection>
 
         <SidebarSection title="Improvements">
           {SIDEBAR_IMPROVEMENTS.map((item) => (
-            <SidebarItem key={item.label} icon={item.icon} label={item.label} indent />
+            <SidebarItem
+              key={item.label}
+              icon={item.icon}
+              label={item.label}
+              indent
+              locked={!!LOCKED_FEATURES[item.label]}
+              onClick={() => handleSidebarItemClick(item.label)}
+            />
           ))}
         </SidebarSection>
 
@@ -659,12 +712,15 @@ const GetStarted = () => {
               <span className="font-semibold">Need help from your team?</span>{" "}
               Invite a teammate to complete your setup.
             </p>
-            <button
+            <Button
+              size="lg"
+              variant="outline"
               onClick={() => setInviteDialogOpen(true)}
-              className="text-sm font-semibold underline underline-offset-2 shrink-0 ml-4"
+              className="shrink-0 gap-2"
             >
+              <UserPlus className="w-4 h-4" />
               Invite a teammate
-            </button>
+            </Button>
           </div>
 
           {/* Steps */}
@@ -736,7 +792,7 @@ const GetStarted = () => {
                       <FileCode className="w-5 h-5" /> WordPress
                     </button>
                     <button onClick={() => setEmailDevDialogOpen(true)} className="flex items-center gap-2 text-sm border border-border rounded px-5 py-3 bg-surface hover:bg-muted transition-colors">
-                      <Mail className="w-5 h-5" /> Email your developer
+                      <Mail className="w-5 h-5" /> Email to your developer
                     </button>
                   </div>
                 </div>
@@ -889,12 +945,27 @@ const GetStarted = () => {
                     )}
 
                     {/* Add form manually — always visible */}
-                    <div className="border border-dashed border-border rounded p-4 flex items-center justify-between">
-                      <p className="text-sm font-semibold">Add your first form</p>
-                      <Button size="sm" variant="outline" onClick={() => openFormDialog()}>
-                        <Plus className="w-3 h-3 mr-1" /> Add form
-                      </Button>
-                    </div>
+                    {!formsCrawled && (
+                      <div className="border border-dashed border-border rounded p-4 flex items-center justify-between">
+                        <p className="text-sm font-semibold">Add your first form</p>
+                        <Button size="sm" variant="outline" onClick={() => openFormDialog()}>
+                          <Plus className="w-3 h-3 mr-1" /> Add form
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Can't find your form — shown after crawl */}
+                    {formsCrawled && (
+                      <p className="text-xs text-muted-foreground">
+                        Can't find your form?{" "}
+                        <button
+                          onClick={() => openFormDialog()}
+                          className="underline underline-offset-2 font-medium text-foreground hover:text-foreground/80 transition-colors"
+                        >
+                          Add a form manually
+                        </button>
+                      </p>
+                    )}
 
                     {!tagVerified && (
                       <p className="text-xs text-muted-foreground">
@@ -1300,7 +1371,7 @@ const GetStarted = () => {
                 { icon: BookOpen, label: "Installation guide" },
                 { icon: Youtube, label: "Watch video" },
                 { icon: MessageSquare, label: "Ask Eureka AI" },
-                { icon: Mail, label: "Email developer", action: () => setEmailDevDialogOpen(true) },
+                { icon: Mail, label: "Email to your developer", action: () => setEmailDevDialogOpen(true) },
                 { icon: Users, label: "Invite teammate", action: () => setInviteDialogOpen(true) },
               ].map((h) => (
                 <button
@@ -1409,22 +1480,23 @@ const GetStarted = () => {
 
               {/* Conversion value slider */}
               <div>
-                <label className="text-sm font-semibold flex items-center gap-1.5 mb-2">
+                <label className="text-sm font-semibold flex items-center gap-1.5 mb-1">
                   Conversion value <InfoTip text="The average revenue or value each form submission generates for your business." />
                 </label>
+                <p className="text-xs text-muted-foreground mb-3">Average order or lead value per conversion. This is an estimate — you can always update it later.</p>
                 <div className="space-y-3">
                   <Slider
-                    value={conversionValue}
-                    onValueChange={setConversionValue}
+                    value={[valueToSliderPosition(conversionValue[0])]}
+                    onValueChange={(pos) => setConversionValue([sliderPositionToValue(pos[0])])}
                     min={0}
-                    max={50000}
-                    step={500}
+                    max={100}
+                    step={1}
                     className="w-full"
                   />
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>€0</span>
+                    <span>€1</span>
                     <span className="text-sm font-semibold text-foreground">€{conversionValue[0].toLocaleString()}</span>
-                    <span>€50,000</span>
+                    <span>€10,000</span>
                   </div>
                 </div>
               </div>
@@ -1480,10 +1552,7 @@ const GetStarted = () => {
                               <p className="text-xs font-semibold truncate">{field.label}</p>
                             )}
                             <p className="text-[10px] text-muted-foreground mt-0.5">
-                              <span className="font-medium text-foreground">Name:</span> {field.nameAttr}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">
-                              <span className="font-medium text-foreground">ID:</span> {field.idAttr}
+                              {field.category}
                             </p>
                           </div>
 
@@ -1915,20 +1984,56 @@ const GetStarted = () => {
       <Dialog open={emailDevDialogOpen} onOpenChange={setEmailDevDialogOpen}>
         <DialogContent className="max-w-[95vw] sm:max-w-[620px] p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Mail className="w-5 h-5" /> Email your developer</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Mail className="w-5 h-5" /> Email to your developer</DialogTitle>
             <DialogDescription>Send the installation instructions to your developer so they can set it up for you.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <FormRow label="Developer's email address">
-              <Input placeholder="developer@company.com" />
-            </FormRow>
-            <FormRow label="Message">
-              <textarea
-                defaultValue={`Hi,\n\nCould you add the Exatom tracking tag to our website? Here are the instructions:\n\n1. Copy this script tag:\n<script src="https://assets.exatom.io/event.js?clientCode=SWVN" async></script>\n\n2. Paste it in the <head> section of every page that has a form.\n\n3. Once installed, let me know so I can verify it's working.\n\nThanks!`}
-                className="w-full min-h-[160px] border border-input rounded px-3 py-2 text-sm bg-background placeholder:text-muted-foreground resize-y"
+              <Input
+                placeholder="developer@company.com"
+                value={emailDevAddress}
+                onChange={(e) => setEmailDevAddress(e.target.value)}
               />
             </FormRow>
-            <Button className="w-full gap-2">
+            <FormRow label={<>Add a personal note <span className="text-muted-foreground font-normal">(optional)</span></>}>
+              <Textarea
+                placeholder="Add a personal note (optional)"
+                value={emailDevPersonalNote}
+                onChange={(e) => setEmailDevPersonalNote(e.target.value)}
+                className="min-h-[80px] resize-none"
+              />
+            </FormRow>
+            <div>
+              <p className="text-sm font-semibold mb-2">Email preview</p>
+              <div className="bg-muted/40 rounded-lg p-4 text-sm font-mono space-y-2 text-muted-foreground">
+                <p><span className="text-foreground font-semibold">Subject:</span> Please install Exatom on our website</p>
+                <p>Hi,</p>
+                {emailDevPersonalNote.trim() && (
+                  <p>{emailDevPersonalNote.trim()}</p>
+                )}
+                <p>Could you add the Exatom tracking tag to our website? Here are the instructions:</p>
+                <p>1. Copy this script tag:<br />
+                  {'<script src="https://assets.exatom.io/event.js?clientCode=SWVN" async></script>'}
+                </p>
+                <p>2. Paste it in the &lt;head&gt; section of every page that has a form.</p>
+                <p>3. Once installed, let me know so I can verify it's working.</p>
+                <p>Thanks!</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="email-dev-copy"
+                checked={emailDevSendCopy}
+                onCheckedChange={(checked) => setEmailDevSendCopy(!!checked)}
+              />
+              <label htmlFor="email-dev-copy" className="text-sm cursor-pointer select-none">
+                Send me a copy
+              </label>
+            </div>
+            <Button className="w-full gap-2" onClick={() => {
+              toast.success("Instructions sent to your developer!");
+              setEmailDevDialogOpen(false);
+            }}>
               <Send className="w-4 h-4" /> Send instructions
             </Button>
           </div>
@@ -1941,10 +2046,13 @@ const GetStarted = () => {
           <DialogHeader>
             <DialogTitle>Invite teammates</DialogTitle>
             <DialogDescription>
-              Everyone gets full access during your free trial.
+              Send invites to your team members.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
+            <p className="text-xs text-muted-foreground bg-muted/50 rounded px-3 py-2">
+              All teammates get full access during your trial.
+            </p>
             {inviteRows.map((row, i) => (
               <div key={i} className="flex items-center gap-3">
                 <Input
@@ -1999,7 +2107,7 @@ const GetStarted = () => {
           <DialogHeader>
             <DialogTitle className="text-xl">Boost your form conversions by up to 30%</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground pt-2">
-              Welcome {userName.split(' ')[0]} — your 14-day free trial starts now. In the next few minutes, you'll set up quick wins that give your forms an immediate boost of ~5-8%. The real gains come after — with data-driven optimization.
+              Welcome {userName.split(' ')[0]} — your 14-day free trial starts now. In the next few minutes, you'll set up quick wins that give your forms an immediate boost of ~5-8%. The real gains come after — with data driven optimization.
             </DialogDescription>
           </DialogHeader>
           <div className="border border-border rounded-lg p-4 space-y-3 mt-2">
@@ -2040,57 +2148,95 @@ const GetStarted = () => {
         </DialogContent>
       </Dialog>
 
+      {/* ---- Upgrade Modal (locked features) ---- */}
+      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-[420px] p-8 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
+              <LockKeyhole className="w-7 h-7 text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-bold">{upgradeModalFeature}</h2>
+            <p className="text-sm text-muted-foreground">
+              {LOCKED_FEATURES[upgradeModalFeature] || ""}
+            </p>
+            <Button
+              className="w-full"
+              onClick={() => {
+                setUpgradeModalOpen(false);
+                navigate("/pricing");
+              }}
+            >
+              Upgrade to Growth
+            </Button>
+            <button
+              onClick={() => setUpgradeModalOpen(false)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Maybe later
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* ---- Onboarding Completion Dialog ---- */}
       <Dialog open={completionDialogOpen} onOpenChange={setCompletionDialogOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[620px] p-4 sm:p-8 text-center">
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
-              <PartyPopper className="w-8 h-8" />
-            </div>
-            <h2 className="text-2xl font-bold">You're all set! 🎉</h2>
-            <p className="text-sm text-muted-foreground max-w-md">
-              Your onboarding is complete. Exatom is now tracking your forms and collecting data.
-              It usually takes a <strong>few days</strong> to gather enough data for meaningful insights — we'll notify you as soon as results are ready.
-            </p>
-
-            <div className="w-full bg-surface rounded-lg p-5 space-y-3 text-left">
-              <p className="text-sm font-semibold">What happens next?</p>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li className="flex items-start gap-2">
-                  <BarChart3 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>Data from your form fields will start flowing in over the coming days.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Sparkles className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>Once enough data is collected, you'll get AI-powered recommendations.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Bell className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>Set up <strong>performance alerts</strong> to get notified when something needs attention.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="w-full border border-border rounded-lg p-4 flex items-center gap-3 text-left">
-              <Star className="w-5 h-5 text-primary shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold">Free trial — 14 days remaining</p>
-                <p className="text-xs text-muted-foreground">Full access to all features during your trial.</p>
+        <DialogContent className="max-w-[95vw] sm:max-w-[820px] p-4 sm:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Left: Congratulations */}
+            <div className="flex flex-col gap-4">
+              <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
+                <PartyPopper className="w-8 h-8" />
               </div>
-            </div>
+              <h2 className="text-2xl font-bold">You're all set!</h2>
+              <p className="text-sm text-muted-foreground">
+                Your onboarding is complete. Exatom is now tracking your forms and collecting data.
+                It usually takes a <strong>few days</strong> to gather enough data for meaningful insights — we'll notify you as soon as results are ready.
+              </p>
 
-            <div className="w-full border border-primary/20 bg-primary/5 rounded-lg p-4 flex items-center gap-3 text-left">
-              <TrendingUp className="w-5 h-5 text-primary shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold">Unlock up to +30% conversion improvement</p>
-                <p className="text-xs text-muted-foreground">Upgrade to Pro for data-driven optimization, AI A/B testing, and advanced drop-off recovery.</p>
+              <div className="bg-surface rounded-lg p-4 space-y-3">
+                <p className="text-sm font-semibold">What happens next?</p>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  <li className="flex items-start gap-2">
+                    <BarChart3 className="w-4 h-4 mt-0.5 shrink-0" />
+                    <span>Data from your form fields will start flowing in over the coming days.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Sparkles className="w-4 h-4 mt-0.5 shrink-0" />
+                    <span>Once enough data is collected, you'll get AI-powered recommendations.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Bell className="w-4 h-4 mt-0.5 shrink-0" />
+                    <span>Set up <strong>performance alerts</strong> to get notified when something needs attention.</span>
+                  </li>
+                </ul>
               </div>
-              <Button size="sm" variant="outline" onClick={() => setCompletionDialogOpen(false)}>Explore Pro</Button>
+
+              <div className="border border-border rounded-lg p-4 flex items-center gap-3">
+                <Star className="w-5 h-5 text-primary shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">Free trial — 14 days remaining</p>
+                  <p className="text-xs text-muted-foreground">Full access to all features during your trial.</p>
+                </div>
+              </div>
+
+              <Button variant="outline" onClick={() => setCompletionDialogOpen(false)}>
+                Go to Dashboard
+              </Button>
             </div>
 
-            <div className="flex gap-3 w-full mt-2">
-              <Button variant="outline" className="flex-1" onClick={() => setCompletionDialogOpen(false)}>Go to Dashboard</Button>
-              <Button className="flex-1 gap-1" onClick={() => setCompletionDialogOpen(false)}>
+            {/* Right: Eureka CTA */}
+            <div className="flex flex-col gap-4 justify-center">
+              <div className="border border-primary/20 bg-primary/5 rounded-lg p-6 flex flex-col gap-4">
+                <TrendingUp className="w-8 h-8 text-primary" />
+                <div>
+                  <p className="text-lg font-bold">Unlock up to +30% conversion improvement</p>
+                  <p className="text-sm text-muted-foreground mt-1">Upgrade to Growth for data driven optimization, AI A/B testing, and advanced drop-off recovery.</p>
+                </div>
+                <Button onClick={() => { setCompletionDialogOpen(false); navigate("/pricing"); }}>
+                  Upgrade to Growth
+                </Button>
+              </div>
+              <Button className="gap-1" variant="outline" onClick={() => setCompletionDialogOpen(false)}>
                 <Bell className="w-4 h-4" /> Set up performance alerts
               </Button>
             </div>
@@ -2145,19 +2291,25 @@ const SidebarItem = ({
   label,
   active,
   indent,
+  locked,
+  onClick,
 }: {
   icon: React.ElementType;
   label: string;
   active?: boolean;
   indent?: boolean;
+  locked?: boolean;
+  onClick?: () => void;
 }) => (
   <button
+    onClick={onClick}
     className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors ${
       indent ? "pl-8" : ""
-    } ${active ? "bg-accent font-medium" : "hover:bg-accent"}`}
+    } ${active ? "bg-accent font-medium" : "hover:bg-accent"} ${locked ? "text-muted-foreground" : ""}`}
   >
-    <Icon className="w-4 h-4" />
-    {label}
+    <Icon className="w-4 h-4 shrink-0" />
+    <span className="flex-1 text-left">{label}</span>
+    {locked && <LockKeyhole className="w-3.5 h-3.5 shrink-0 opacity-50" />}
   </button>
 );
 

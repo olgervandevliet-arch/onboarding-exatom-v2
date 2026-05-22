@@ -110,7 +110,6 @@ const ENTERPRISE_FEATURES = [
 /* Comparison table rows */
 const COMPARISON_ROWS: { feature: string; free: boolean | string; growth: boolean | string; enterprise: boolean | string }[] = [
   { feature: "Monthly website visits", free: false, growth: "Up to 50,000", enterprise: "50,000+" },
-  { feature: "Form sessions", free: "Up to 5,000", growth: "Unlimited", enterprise: "Unlimited" },
   { feature: "Number of forms", free: "1", growth: "Unlimited", enterprise: "Unlimited" },
   { feature: "Session recordings", free: false, growth: true, enterprise: true },
   { feature: "Analytics data access", free: "1 month", growth: "13 months", enterprise: "13 months" },
@@ -149,6 +148,10 @@ const FAQS = [
   {
     q: "Can I cancel anytime?",
     a: "Yes. There are no long-term contracts on self-serve plans. Cancel from your dashboard and you'll retain access until the end of your billing period.",
+  },
+  {
+    q: "What happens if I temporarily exceed my visit limit?",
+    a: "No worries — a short traffic spike won't immediately push you to the next tier. We look at your average usage over time. If you consistently exceed your limit, we'll reach out before making any changes.",
   },
 ];
 

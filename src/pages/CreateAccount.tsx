@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Logo from "@/components/Logo";
 
 const CreateAccount = () => {
@@ -29,9 +29,16 @@ const CreateAccount = () => {
 
   return (
     <div className="relative min-h-screen bg-background">
-      {/* Logo */}
-      <div className="absolute top-4 left-4 sm:top-6 sm:left-8">
+      {/* Logo + Back */}
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-8 flex flex-col gap-2">
         <Logo maxWidth="96px" onClick={() => navigate("/pricing")} />
+        <button
+          onClick={() => navigate("/pricing")}
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
       </div>
 
       {/* Centered content */}
