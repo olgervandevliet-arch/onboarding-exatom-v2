@@ -325,7 +325,8 @@ const GetStarted = () => {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [tagVerified, setTagVerified] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
+  const [step5ModalOpen, setStep5ModalOpen] = useState(false);
+  const [step5ModalSeen, setStep5ModalSeen] = useState(false);
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // User data from onboarding
@@ -343,6 +344,13 @@ const GetStarted = () => {
     if (company) setCompanyName(company);
     if (website) setWebsiteUrl(website);
   }, []);
+
+  useEffect(() => {
+    if (expandedStep === 5 && !step5ModalSeen) {
+      setTimeout(() => setStep5ModalOpen(true), 350);
+      setStep5ModalSeen(true);
+    }
+  }, [expandedStep]);
 
   // Added forms
   const [addedForms, setAddedForms] = useState<AddedForm[]>([]);
@@ -422,9 +430,6 @@ const GetStarted = () => {
       (s) => s > step && !newCompleted.has(s)
     );
     setExpandedStep(nextStep ?? null);
-    if (newCompleted.size === 5) {
-      setTimeout(() => setCompletionDialogOpen(true), 500);
-    }
   };
 
   const skipStep = (step: number) => {
@@ -434,9 +439,6 @@ const GetStarted = () => {
       (s) => s > step && !newCompleted.has(s)
     );
     setExpandedStep(nextStep ?? null);
-    if (newCompleted.size === 5) {
-      setTimeout(() => setCompletionDialogOpen(true), 500);
-    }
   };
 
   const completedCount = completedSteps.size;
@@ -1379,60 +1381,39 @@ const GetStarted = () => {
               onToggle={() => toggleStep(5)}
               locked={!completedSteps.has(4)}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left: Celebration */}
-                <div className="flex flex-col gap-4">
-                  <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center">
-                    <PartyPopper className="w-7 h-7" />
-                  </div>
+              <div className="flex flex-col gap-6 max-w-md">
+                {/* Expectation — plain prose, no box */}
+                <div>
+                  <p className="text-sm font-semibold">While your website is collecting data…</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    It usually takes a <strong className="text-foreground">few days</strong> before
+                    you have enough data for meaningful insights. We'll notify you as soon as they're ready.
+                  </p>
+                </div>
+
+                {/* Eureka CTA — primary */}
+                <div className="border-2 border-foreground rounded-xl p-6 flex flex-col gap-3">
+                  <Sparkles className="w-6 h-6" />
                   <div>
-                    <h3 className="text-xl font-bold">Exatom is ready!</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Your setup is complete. Exatom is now tracking your forms and collecting data.
+                    <p className="text-base font-bold">Explore your forms with Eureka</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      Ask Eureka AI anything about your form performance — even before your data is in.
                     </p>
                   </div>
-
-                  <div className="bg-surface rounded-lg p-4 space-y-3 border border-border">
-                    <p className="text-sm font-semibold">What happens next?</p>
-                    <ul className="text-sm text-muted-foreground space-y-2">
-                      <li className="flex items-start gap-2">
-                        <BarChart3 className="w-4 h-4 mt-0.5 shrink-0" />
-                        <span>It usually takes a <strong className="text-foreground">few days</strong> before you have enough data for meaningful insights.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Bell className="w-4 h-4 mt-0.5 shrink-0" />
-                        <span>We'll notify you as soon as your first insights are ready.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Sparkles className="w-4 h-4 mt-0.5 shrink-0" />
-                        <span>In the meantime, explore Exatom with <strong className="text-foreground">demo data</strong> to see what insights look like.</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <StepActions
-                    onComplete={() => completeStep(5)}
-                    completeLabel="Go to dashboard"
-                  />
-                </div>
-
-                {/* Right: Eureka CTA + case studies */}
-                <div className="flex flex-col gap-4">
-                  <div className="border-2 border-foreground rounded-xl p-6 flex flex-col gap-4">
-                    <Sparkles className="w-7 h-7" />
-                    <div>
-                      <p className="text-lg font-bold">Explore your forms with Eureka</p>
-                      <p className="text-sm text-muted-foreground mt-1">Ask Eureka AI anything about your form performance — even before your data is in.</p>
-                    </div>
-                    <Button size="lg" className="w-full gap-2">
-                      <MessageSquare className="w-4 h-4" /> Ask Eureka AI
-                    </Button>
-                  </div>
-
-                  <Button variant="outline" className="w-full gap-2">
-                    <Monitor className="w-4 h-4" /> View a dashboard with demo data
+                  <Button className="w-full gap-2">
+                    <MessageSquare className="w-4 h-4" /> Ask Eureka AI
                   </Button>
                 </div>
+
+                {/* Demo — secondary */}
+                <Button variant="outline" className="w-full gap-2">
+                  <Monitor className="w-4 h-4" /> View a dashboard with demo data
+                </Button>
+
+                <StepActions
+                  onComplete={() => completeStep(5)}
+                  completeLabel="Go to dashboard"
+                />
               </div>
             </AccordionStep>
           </div>
@@ -2253,18 +2234,20 @@ const GetStarted = () => {
       </Dialog>
 
       {/* ---- Onboarding Completion Dialog ---- */}
-      <Dialog open={completionDialogOpen} onOpenChange={setCompletionDialogOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[420px] p-8 text-center">
-          <div className="flex flex-col items-center gap-4">
+      <Dialog open={step5ModalOpen} onOpenChange={setStep5ModalOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-[400px] p-8 text-center">
+          <div className="flex flex-col items-center gap-5">
             <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
               <PartyPopper className="w-8 h-8" />
             </div>
-            <h2 className="text-xl font-bold">You're all set!</h2>
-            <p className="text-sm text-muted-foreground">
-              Exatom is tracking your forms. Check back in a few days for your first insights.
-            </p>
-            <Button className="w-full" onClick={() => { setCompletionDialogOpen(false); navigate("/get-started"); }}>
-              Go to dashboard
+            <div>
+              <h2 className="text-2xl font-bold">You're done! 🎉</h2>
+              <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+                Exatom is set up and tracking your forms. While data comes in, explore what Exatom can show you.
+              </p>
+            </div>
+            <Button className="w-full" onClick={() => setStep5ModalOpen(false)}>
+              Let's go →
             </Button>
           </div>
         </DialogContent>

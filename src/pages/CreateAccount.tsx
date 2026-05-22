@@ -41,10 +41,18 @@ const CreateAccount = () => {
         </button>
       </div>
 
+      {/* Already have an account — top right */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-8">
+        <p className="text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <a href="#" className="underline text-foreground font-medium">Login</a>
+        </p>
+      </div>
+
       {/* Centered content */}
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-8 py-20">
         <div className="w-full max-w-md space-y-6">
-          <div>
+          <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
               Let's get you started
             </h1>
@@ -125,7 +133,7 @@ const CreateAccount = () => {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-foreground text-background hover:bg-foreground/90 disabled:bg-foreground disabled:text-background disabled:opacity-100"
+              className="w-full bg-black text-white hover:bg-black/90 disabled:bg-black disabled:text-white disabled:opacity-40"
               disabled={!canSubmit}
             >
               Sign up
@@ -137,11 +145,6 @@ const CreateAccount = () => {
             <a href="#" className="underline text-foreground">Terms of Service</a>{" "}
             and{" "}
             <a href="#" className="underline text-foreground">Privacy Policy</a>.
-          </p>
-
-          <p className="text-center text-sm text-muted-foreground pt-2">
-            Already have an account?{" "}
-            <a href="#" className="underline text-foreground font-medium">Login</a>
           </p>
         </div>
       </div>
